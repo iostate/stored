@@ -1,20 +1,17 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import propTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { fetchPosts } from '../actions/postActions';
 
 class Posts extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            posts: []
-        };
-    }
     componentWillMount() {
-        fetch('https://jsonplaceholder.typicode.com/posts')
-            .then(res => res.json())
-            .then(data => this.setState({posts: data}));
+      this.props.fetchPosts();
     }
   render() {
-      const postItems = this.state.posts.map(post => (
+    // no longer have posts inside the component's state
+    // make sure to call from props.. 
+    // posts variable comes from postReducer
+      const postItems = this.props.posts.map(post => (
           <div key={post.id}>
             <h3>{post.title}</h3>
             <p>{post.body}</p>
@@ -28,5 +25,17 @@ class Posts extends Component {
     )
   }
 }
+Posts.propTypes = {
+  fetchPosts: propTypes.func.isRequired,
+  posts: propTypes.array.isRequired
+};
+const mapStateToProps = state => ({
+  posts: state.posts.items
+});
 
-export default Posts
+
+// instead of export default Posts we are going to use
+// export default connect
+// export default Posts <!--no longer in use-->
+// make sure to pass in the current state as first argument
+export default connect(mapStateToProps, { fetchPosts })(Posts);
